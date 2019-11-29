@@ -15,9 +15,14 @@ def start(update, context):
     context.bot.send_message(chat_id=update.effective_chat.id,
                              text="Hello! My name is {0}".format(config.name))
 
+def photo(update, context):
+    print(update.message.photo)
+
 start_handler = CommandHandler('start', start)
+photo_handler = MessageHandler(Filters.photo, photo)
 
 dp.add_handler(start_handler)
+dp.add_handler(photo_handler)
 
 def main():
     upd.start_polling()
