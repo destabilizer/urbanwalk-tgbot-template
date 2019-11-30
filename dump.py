@@ -11,7 +11,7 @@ def fnpath(username, ts, ft, fmt):
     return os.path.join(datadir, '{0}_{1}_{2}.{3}'.format(username, ts, ft, fmt))
 
 def data_with_location(filetype, data, username, location):
-    datadir = os.path.join(os.path.ex)
+    print('going to save data', filetype, data, username, location)
     ts = datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H-%M-%S')
     if filetype == 'photo':
         data.download(fnpath(username, ts, filetype, 'jpg'))
@@ -22,5 +22,6 @@ def data_with_location(filetype, data, username, location):
             textf.write(data)
     else:
         raise TypeError('wrong filetype')
-    with open(os.path.join(datadir, '_.json')) as locf:
-        locf.write(json.dumps(location, indent=2))
+    with open(fnpath(username, ts, filetype, 'json'), 'w') as locf:
+        locf.write(json.dumps({'longitude': location.longitude,
+                               'latitude': location.latitude}, indent=2))

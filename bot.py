@@ -4,24 +4,25 @@ from telegram.utils.request import Request
 
 import config
 
-import json
-import datetime
+import dump
+import logging
 
 req = Request(proxy_url=config.proxy)
 bot = Bot(config.token, request=req)
 upd = Updater(bot=bot, use_context=True)
-
+currentFile = None
 dp = upd.dispatcher
+
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+                     level=logging.INFO)
 
 def start(update, context):
     context.bot.send_message(chat_id=update.effective_chat.id,
                              text="Hello! My name is {0}".format(config.name))
 
 def photo(update, context):
-    file_id = update.message.photo[-1].file_id
-    newFile = bot.get_file(file_id)
-    print(file_id)
-    newFile.download(str(file_id) + '.jpg')
+    global currentFile
+    currentFile = update.message.photo[-1].file_id
     context.bot.send_message(chat_id=update.effective_chat.id,
                              text="Thanks for sharing the picture!")
     request_location(context.bot, chat_id=update.effective_chat.id)
@@ -44,7 +45,7 @@ def request_location(bot, chat_id):
                      reply_markup=reply_markup)
 
 def location(update, context):
-    print(update.message.location)
+    dump.data_with_location("photo", bot.get_file(currentFile), update.message.from_user.username, update.message.location)
     context.bot.send_message(chat_id=update.effective_chat.id,
                              text='Thank you for sharing location')
 
@@ -55,7 +56,7 @@ dp.add_handler(MessageHandler(Filters.voice, voice))
 
 def main():
     upd.start_polling()
-    upd.idle()
+    #upd.idle()
 
 if __name__ == '__main__':
     main()
